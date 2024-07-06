@@ -6,7 +6,7 @@ from databases import Database
 app = FastAPI()
 
 # Configure your PostgreSQL database connection here
-DATABASE_URL = "postgresql://user:password@localhost/dbname"
+DATABASE_URL = "postgresql://image_owner:wVeIv0ujTJ5x@ep-autumn-fire-a1wvd4tl.ap-southeast-1.aws.neon.tech/image?sslmode=require"
 database = Database(DATABASE_URL)
 
 @app.on_event("startup")
