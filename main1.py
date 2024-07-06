@@ -2,20 +2,18 @@ from fastapi import FastAPI, UploadFile
 import os
 import aiofiles
 from databases import Database
+from dotenv import load_dotenv
+import psycopg2
+
+load_dotenv()
+
+try:
+    connection = psycopg2.connect(os.getenv("DATABASE_URL"))
+    print("Database connection successful")
+except Exception as e:
+    print(f"Error connecting to the database: {e}")
 
 app = FastAPI()
-
-# Configure your PostgreSQL database connection here
-DATABASE_URL = "postgresql://image_owner:wVeIv0ujTJ5x@ep-autumn-fire-a1wvd4tl.ap-southeast-1.aws.neon.tech/image?sslmode=require"
-database = Database(DATABASE_URL)
-
-@app.on_event("startup")
-async def startup():
-    await database.connect()
-
-@app.on_event("shutdown")
-async def shutdown():
-    await database.disconnect()
 
 @app.post("/uploadfile/")
 async def create_upload_file(file: UploadFile):
@@ -38,12 +36,12 @@ async def create_upload_file(file: UploadFile):
             filepath TEXT NOT NULL
         );
     """
-    await database.execute(query=query)
+    await connection.execute(query=query)
 
     query = """
         INSERT INTO image (filename, filepath) VALUES (:filename, :filepath)
     """
     values = {"filename": safe_filename, "filepath": file_path}
-    await database.execute(query=query, values=values)
+    await connection.execute(query=query, values=values)
 
     return {"filename": safe_filename, "path": file_path}
