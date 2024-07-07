@@ -6,10 +6,10 @@ import aiofiles
 
 app = FastAPI()
 
-# Load .env file
+
 load_dotenv()
 
-# Get the connection string from the environment variable
+
 connection_string = os.getenv("DATABASE_URL")
 pool = None
 
@@ -21,7 +21,8 @@ async def startup_event():
 
 @app.on_event("shutdown")
 async def startup_event():
-    await app.pool.close()
+    global pool
+    await pool.close()
 
 @app.post("/images")
 async def create_image():
